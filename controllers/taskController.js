@@ -101,7 +101,13 @@ async function deleteTask(req, res) {
       return res.status(404).json({ message: "Task not found or access denied." });
     }
 
-    // Delete task (cascades to linked sessions due to ON DELETE CASCADE)
+    // Delete linked sessions first to prevent foreign key constraint failures on legacy databases
+    await db.query(
+      "DELETE FROM sessions WHERE task_id = ?",
+      [taskId]
+    );
+
+    // Delete the task itself
     await db.query(
       "DELETE FROM tasks WHERE task_id = ? AND user_id = ?",
       [taskId, userId]
