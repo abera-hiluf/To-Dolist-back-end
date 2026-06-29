@@ -5,6 +5,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const taskRoutes = require('./routes/taskRoutes')
 const sessionRoutes = require('./routes/sessionRoutes')
+const authRoutes = require('./routes/authRoutes')
+const authMiddleware = require('./middleware/authMiddleware')
 const createTable = require("./migrate/createTable");
 
 
@@ -22,8 +24,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 //routing
-app.use("/api/tasks", taskRoutes);
-app.use("/api/sessions", sessionRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/tasks", authMiddleware, taskRoutes);
+app.use("/api/sessions", authMiddleware, sessionRoutes);
 
 async function start() {
   try {
